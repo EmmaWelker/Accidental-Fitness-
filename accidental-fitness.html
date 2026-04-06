@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0e0e12;--surface:#161620;--surface2:#1e1e2e;--surface3:#252535;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --text:#f0eeff;--muted:#8884a8;--dim:#4a4868;
+  --accent:#7c6dfa;--accent2:#a594fb;
+  --green:#3dd68c;--amber:#f5a623;--coral:#ff6b6b;--teal:#5cebd4;--pink:#f06292;
+  --low:#5cebd4;--med:#a594fb;--high:#f06292;
+  --r:14px;--rs:9px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-size:15px;line-height:1.5;padding-bottom:84px;}
+.app{max-width:420px;margin:0 auto;}
+
+/* TOPBAR */
+.topbar{padding:22px 20px 10px;display:flex;align-items:flex-start;justify-content:space-between;}
+.brand-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.01em;}
+.brand-tag{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:1px;}
+.xp-pill{background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:12px;font-family:'Space Mono',monospace;color:var(--amber);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.xp-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+
+/* XP BAR */
+.xp-section{padding:0 20px 6px;}
+.xp-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:5px;}
+.xp-track{height:4px;background:var(--surface3);border-radius:99px;overflow:hidden;}
+.xp-fill{height:100%;border-radius:99px;background:var(--accent);width:52%;transition:width .6s ease;}
+
+/* STREAK ROW */
+.streak-row{padding:10px 20px 14px;display:flex;gap:8px;}
+.streak-pill{background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:12px;}
+.streak-pill.active{border-color:var(--accent);}
+.streak-icon{font-size:14px;}
+.streak-num{font-family:'Space Mono',monospace;font-weight:700;font-size:13px;}
+.streak-label{color:var(--muted);font-size:11px;}
+.streak-grace{font-size:10px;color:var(--amber);font-family:'Space Mono',monospace;margin-left:2px;}
+
+/* TABS */
+.tabs{display:flex;margin:0 20px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:3px;gap:2px;}
+.tab{flex:1;padding:8px 4px;text-align:center;font-size:12px;font-weight:700;border-radius:7px;cursor:pointer;color:var(--muted);transition:background .2s,color .2s;}
+.tab.active{background:var(--surface3);color:var(--text);}
+
+/* SECTION HEAD */
+.sh{padding:6px 20px 10px;display:flex;justify-content:space-between;align-items:center;}
+.st{font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;}
+.sl{font-size:11px;color:var(--accent);cursor:pointer;font-family:'Space Mono',monospace;}
+
+/* PILL */
+.pill{border-radius:99px;padding:3px 10px;font-size:10px;font-family:'Space Mono',monospace;border:1px solid;}
+.pill-green{color:var(--green);border-color:rgba(61,214,140,.3);background:rgba(61,214,140,.08);}
+.pill-amber{color:var(--amber);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.08);}
+.pill-accent{color:var(--accent2);border-color:rgba(165,148,251,.3);background:rgba(165,148,251,.08);}
+.pill-low{color:var(--low);border-color:rgba(92,235,212,.3);background:rgba(92,235,212,.08);}
+.pill-med{color:var(--med);border-color:rgba(165,148,251,.3);background:rgba(165,148,251,.08);}
+.pill-high{color:var(--high);border-color:rgba(240,98,146,.3);background:rgba(240,98,146,.08);}
+
+/* ENERGY SELECTOR */
+.energy-selector{margin:0 20px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.energy-btn{border-radius:var(--r);padding:16px 8px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .2s;background:var(--surface);}
+.energy-btn.low{border-color:rgba(92,235,212,.25);}
+.energy-btn.low.selected{border-color:var(--low);background:rgba(92,235,212,.08);}
+.energy-btn.med{border-color:rgba(165,148,251,.25);}
+.energy-btn.med.selected{border-color:var(--med);background:rgba(165,148,251,.08);}
+.energy-btn.high{border-color:rgba(240,98,146,.25);}
+.energy-btn.high.selected{border-color:var(--high);background:rgba(240,98,146,.08);}
+.energy-icon{font-size:26px;margin-bottom:6px;}
+.energy-label{font-size:13px;font-weight:800;}
+.energy-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3;}
+.energy-btn.low .energy-label{color:var(--low);}
+.energy-btn.med .energy-label{color:var(--med);}
+.energy-btn.high .energy-label{color:var(--high);}
+
+/* STAND NUDGE */
+.nudge-card{margin:0 20px 12px;background:var(--surface2);border:1px solid rgba(245,166,35,.3);border-radius:var(--r);padding:13px 14px;display:flex;align-items:center;gap:12px;}
+.nudge-icon{width:38px;height:38px;border-radius:var(--rs);background:rgba(245,166,35,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.nudge-text{font-size:13px;font-weight:700;line-height:1.3;}
+.nudge-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.nudge-dismiss{margin-left:auto;font-size:11px;color:var(--dim);cursor:pointer;padding:4px 8px;flex-shrink:0;font-family:'Space Mono',monospace;}
+
+/* MOVEMENT CARDS */
+.move-card{margin:0 20px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:border-color .2s,transform .1s;display:flex;align-items:center;gap:12px;}
+.move-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.move-card.low-energy{border-color:rgba(92,235,212,.15);}
+.move-card.med-energy{border-color:rgba(165,148,251,.15);}
+.move-card.high-energy{border-color:rgba(240,98,146,.15);}
+.move-emoji{font-size:24px;flex-shrink:0;width:36px;text-align:center;}
+.move-body{flex:1;}
+.move-title{font-size:14px;font-weight:700;line-height:1.2;}
+.move-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.move-meta{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.move-time{font-size:10px;font-family:'Space Mono',monospace;color:var(--dim);}
+.move-xp{font-size:10px;font-family:'Space Mono',monospace;color:var(--amber);}
+.move-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+
+/* HABIT TRIGGERS */
+.habit-section{margin:0 20px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.habit-header{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.habit-emoji{font-size:18px;}
+.habit-name{font-size:13px;font-weight:700;flex:1;}
+.habit-chips{padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px;}
+.habit-chip{background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:700;}
+.habit-chip:hover{border-color:var(--accent);color:var(--accent2);}
+
+/* ACTIVE TIMER */
+.timer-card{margin:0 20px 12px;background:var(--surface);border:2px solid var(--accent);border-radius:var(--r);padding:20px;text-align:center;position:relative;overflow:hidden;}
+.timer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--teal));}
+.timer-label{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:4px;}
+.timer-display{font-size:52px;font-weight:800;font-family:'Space Mono',monospace;color:var(--text);line-height:1;}
+.timer-desc{font-size:12px;color:var(--muted);margin:8px 0 16px;line-height:1.4;}
+.timer-btns{display:flex;gap:10px;justify-content:center;}
+.timer-btn{border-radius:var(--rs);padding:9px 20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s;}
+.timer-btn.pause{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
+.timer-btn.done{background:var(--green);color:#0e0e12;}
+.timer-stopped{font-size:12px;color:var(--muted);margin-top:10px;font-style:italic;}
+
+/* STEALTH LOG */
+.stealth-grid{margin:0 20px 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.stealth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;cursor:pointer;transition:border-color .2s,transform .1s;text-align:center;}
+.stealth-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.stealth-emoji{font-size:22px;margin-bottom:5px;}
+.stealth-name{font-size:12px;font-weight:700;line-height:1.2;}
+.stealth-xp{font-size:10px;color:var(--amber);font-family:'Space Mono',monospace;margin-top:3px;}
+
+/* HYDRATION */
+.hydration-card{margin:0 20px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.hydration-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.hydration-title{font-size:14px;font-weight:700;}
+.hydration-since{font-size:11px;color:var(--amber);font-family:'Space Mono',monospace;}
+.hydration-track{height:8px;background:var(--surface3);border-radius:99px;overflow:hidden;margin-bottom:10px;}
+.hydration-fill{height:100%;border-radius:99px;background:var(--teal);transition:width .5s ease;}
+.hydration-label{font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;}
+.hydration-btns{display:flex;gap:8px;}
+.hydration-btn{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:9px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--text);transition:border-color .2s;}
+.hydration-btn:hover{border-color:var(--teal);}
+.hydration-btn.primary{background:rgba(92,235,212,.12);border-color:rgba(92,235,212,.3);color:var(--teal);}
+
+/* WATER REMINDER */
+.water-nudge{margin:0 20px 12px;background:var(--surface2);border:1px solid rgba(92,235,212,.25);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.water-icon{width:36px;height:36px;border-radius:var(--rs);background:rgba(92,235,212,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.water-text{font-size:13px;font-weight:700;}
+.water-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.water-log-btn{margin-left:auto;background:rgba(92,235,212,.15);border:1px solid rgba(92,235,212,.3);border-radius:99px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--teal);cursor:pointer;font-family:'Space Mono',monospace;white-space:nowrap;flex-shrink:0;}
+
+/* FUEL RINGS */
+.fuel-card{margin:0 20px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.fuel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.fuel-title{font-size:15px;font-weight:700;}
+.fuel-subtitle{font-size:11px;color:var(--muted);margin-top:2px;}
+.fuel-rings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.ring-svg{width:60px;height:60px;}
+.ring-label{font-size:11px;color:var(--muted);text-align:center;line-height:1.2;}
+.ring-status{font-size:10px;font-family:'Space Mono',monospace;text-align:center;font-weight:700;}
+.status-good{color:var(--green);}.status-low{color:var(--amber);}.status-ok{color:var(--teal);}
+.fuel-insight{background:var(--surface2);padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.5;border-left:2px solid var(--accent);}
+.fuel-insight strong{color:var(--accent2);font-weight:700;}
+.nutrients-card{margin:0 20px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
+.nutrient-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.nutrient-row:last-child{border-bottom:none;padding-bottom:0;}
+.nutrient-row:first-child{padding-top:0;}
+.nutrient-icon{width:32px;height:32px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.nutrient-name{font-size:13px;font-weight:700;flex:1;}
+.nutrient-why{font-size:11px;color:var(--muted);}
+.nutrient-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--dim);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s;}
+.nutrient-check.checked{background:var(--green);border-color:var(--green);color:#0e0e12;}
+.mode-toggle{margin:0 20px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3px;display:flex;}
+.mode-btn{flex:1;padding:9px 6px;text-align:center;font-size:12px;font-weight:700;border-radius:9px;cursor:pointer;color:var(--muted);transition:all .2s;}
+.mode-btn.active{background:var(--surface3);color:var(--text);}
+.log-panel{margin:0 20px 10px;}
+.log-option{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s;margin-bottom:8px;}
+.log-option:hover{border-color:var(--border2);}
+.log-option:last-child{margin-bottom:0;}
+.lo-icon{width:38px;height:38px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.lo-text{font-size:13px;font-weight:700;}
+.lo-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.lo-xp{margin-left:auto;font-size:11px;font-family:'Space Mono',monospace;color:var(--amber);flex-shrink:0;}
+.low-spoons{margin:0 20px 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.spoon-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;cursor:pointer;transition:border-color .2s;}
+.spoon-card:hover{border-color:var(--border2);}
+.spoon-card.logged{border-color:rgba(61,214,140,.4);}
+.spoon-emoji{font-size:22px;margin-bottom:6px;}
+.spoon-name{font-size:13px;font-weight:700;line-height:1.2;margin-bottom:3px;}
+.spoon-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.spoon-tag{font-size:10px;font-family:'Space Mono',monospace;padding:2px 6px;border-radius:99px;border:1px solid;}
+.tag-p{color:var(--teal);border-color:rgba(92,235,212,.3);}
+.tag-e{color:var(--accent2);border-color:rgba(165,148,251,.3);}
+.tag-z{color:var(--amber);border-color:rgba(245,166,35,.3);}
+.tag-o{color:var(--pink);border-color:rgba(240,98,146,.3);}
+.spoon-logged-badge{display:none;font-size:10px;color:var(--green);font-family:'Space Mono',monospace;margin-top:4px;}
+.spoon-card.logged .spoon-logged-badge{display:block;}
+.meal-log{margin:0 20px 10px;}
+.meal-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.meal-circle{width:20px;height:20px;border-radius:50%;border:2px solid var(--green);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.meal-circle.empty{border-color:var(--dim);}
+.meal-circle-dot{width:8px;height:8px;border-radius:50%;background:var(--green);}
+.meal-time{font-size:10px;color:var(--dim);font-family:'Space Mono',monospace;min-width:52px;}
+.meal-name-text{font-size:13px;font-weight:700;}
+.meal-tags-row{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.meal-add{font-size:12px;color:var(--dim);font-style:italic;cursor:pointer;}
+.meal-add:hover{color:var(--muted);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:420px;max-width:100vw;background:var(--surface);border-top:1px solid var(--border2);display:flex;padding:10px 0 18px;z-index:50;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;opacity:.35;transition:opacity .15s;}
+.nav-item.active{opacity:1;}
+.nav-icon{font-size:20px;}
+.nav-label{font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);}
+.nav-item.active .nav-label{color:var(--accent2);}
+
+/* TOAST */
+.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#0e0e12;border-radius:99px;padding:10px 20px;font-size:13px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap;z-index:100;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.hidden{display:none!important;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+.pulse{animation:pulse .35s ease;}
+
+/* BRIBE TAB */
+.bribe-hero{margin:0 20px 14px;background:var(--surface);border:1px solid rgba(245,166,35,.3);border-radius:var(--r);padding:16px;text-align:center;}
+.bribe-hero-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+.bribe-hero-sub{font-size:12px;color:var(--muted);line-height:1.5;}
+.task-group-label{margin:0 20px 6px;font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;}
+.task-card{margin:0 20px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .2s;}
+.task-card.done{border-color:rgba(61,214,140,.35);opacity:.7;}
+.task-header{padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.task-emoji{font-size:22px;flex-shrink:0;width:32px;text-align:center;}
+.task-info{flex:1;}
+.task-name{font-size:14px;font-weight:700;line-height:1.2;}
+.task-bare{font-size:11px;color:var(--muted);margin-top:2px;}
+.task-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.task-reward-tag{font-size:10px;font-family:'Space Mono',monospace;color:var(--amber);white-space:nowrap;}
+.task-expand{font-size:18px;color:var(--dim);transition:transform .2s;line-height:1;}
+.task-card.open .task-expand{transform:rotate(90deg);}
+.task-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.task-card.open .task-body{display:block;}
+.task-nope{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 12px;margin:10px 0 8px;font-size:12px;color:var(--muted);line-height:1.5;}
+.task-nope strong{color:var(--accent2);font-weight:700;display:block;margin-bottom:3px;}
+.task-btns{display:flex;gap:8px;margin-top:10px;}
+.task-btn{flex:1;border:none;border-radius:var(--rs);padding:10px 8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;text-align:center;}
+.task-btn.bare{background:var(--surface3);color:var(--muted);}
+.task-btn.full{background:var(--accent);color:white;}
+.task-btn.bare:hover{opacity:.8;}.task-btn.full:hover{opacity:.9;}
+
+/* REWARD MODAL */
+.reward-overlay{position:fixed;inset:0;background:rgba(14,14,18,.88);z-index:80;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.reward-overlay.show{opacity:1;pointer-events:all;}
+.reward-sheet{width:100%;max-width:420px;background:var(--surface);border-radius:var(--r) var(--r) 0 0;border:1px solid var(--border2);border-bottom:none;padding:20px 20px 44px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1);}
+.reward-overlay.show .reward-sheet{transform:translateY(0);}
+.reward-handle{width:36px;height:4px;background:var(--dim);border-radius:99px;margin:0 auto 18px;}
+.reward-title{font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.reward-task-name{font-size:20px;font-weight:800;margin-bottom:16px;line-height:1.2;}
+.reward-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.reward-card{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:12px;cursor:pointer;transition:border-color .2s,transform .1s;text-align:center;}
+.reward-card:hover{border-color:var(--accent2);transform:scale(1.02);}
+.reward-card.selected{border-color:var(--green);background:rgba(61,214,140,.08);}
+.reward-emoji{font-size:24px;margin-bottom:6px;}
+.reward-name{font-size:12px;font-weight:700;line-height:1.2;}
+.reward-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3;}
+.reward-confirm{width:100%;background:var(--green);border:none;border-radius:var(--rs);padding:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#0e0e12;cursor:pointer;opacity:.4;transition:opacity .2s;}
+.reward-confirm.ready{opacity:1;}
+.reward-close{display:block;text-align:center;margin-top:10px;font-size:12px;color:var(--dim);cursor:pointer;font-family:'Space Mono',monospace;}
+
+/* COMBO BANNER */
+.combo-banner{margin:0 20px 12px;background:rgba(165,148,251,.1);border:1px solid rgba(165,148,251,.3);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.combo-icon{font-size:20px;flex-shrink:0;}
+.combo-text{font-size:13px;font-weight:700;color:var(--accent2);}
+.combo-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* SIDE QUEST */
+.sq-hero{margin:0 20px 14px;background:var(--surface);border:1px solid rgba(92,235,212,.25);border-radius:var(--r);padding:18px;position:relative;overflow:hidden;}
+.sq-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),var(--accent));}
+.sq-hero-eyebrow{font-size:10px;font-family:'Space Mono',monospace;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
+.sq-hero-title{font-size:20px;font-weight:800;line-height:1.2;margin-bottom:4px;}
+.sq-hero-sub{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+.sq-hero-address{font-size:11px;font-family:'Space Mono',monospace;color:var(--dim);margin-bottom:14px;}
+.sq-checkin-btn{width:100%;background:var(--teal);color:#0e0e12;border:none;border-radius:var(--rs);padding:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .15s;}
+.sq-checkin-btn:hover{opacity:.9;}
+.sq-checkin-btn.done{background:var(--green);}
+.sq-rule{margin:0 20px 10px;background:var(--surface2);border-left:2px solid var(--teal);padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.5;}
+.sq-rule strong{color:var(--teal);font-weight:700;}
+.sq-nudge-card{margin:0 20px 8px;background:var(--surface);border:1px solid rgba(92,235,212,.2);border-radius:var(--r);padding:13px 14px;cursor:pointer;transition:border-color .2s,transform .1s;display:flex;align-items:center;gap:12px;}
+.sq-nudge-card:hover{border-color:var(--teal);transform:translateY(-1px);}
+.sq-nudge-emoji{font-size:22px;flex-shrink:0;width:32px;text-align:center;}
+.sq-nudge-title{font-size:13px;font-weight:700;line-height:1.2;}
+.sq-nudge-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.sq-nudge-tag{margin-left:auto;font-size:10px;font-family:'Space Mono',monospace;color:var(--teal);flex-shrink:0;}
+.sq-activity-grid{margin:0 20px 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.sq-activity{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;cursor:pointer;transition:border-color .2s;text-align:center;}
+.sq-activity:hover{border-color:var(--border2);}
+.sq-activity.picked{border-color:rgba(92,235,212,.4);background:rgba(92,235,212,.06);}
+.sq-activity-emoji{font-size:22px;margin-bottom:5px;}
+.sq-activity-name{font-size:12px;font-weight:700;}
+.sq-activity-note{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3;}
+.sq-reward-pair{margin:0 20px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.sq-reward-header{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.sq-reward-title{font-size:13px;font-weight:700;flex:1;}
+.sq-reward-chips{padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px;}
+.sq-chip{background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;font-weight:700;}
+.sq-chip:hover{border-color:var(--teal);color:var(--teal);}
+.sq-chip.active{border-color:var(--teal);color:var(--teal);background:rgba(92,235,212,.08);}
+.sq-checkin-done{margin:0 20px 12px;background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.3);border-radius:var(--r);padding:16px;text-align:center;display:none;}
+.sq-done-title{font-size:18px;font-weight:800;color:var(--green);margin-bottom:4px;}
+.sq-done-sub{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* PRIZES TAB */
+.pts-balance{margin:0 20px 14px;background:var(--surface);border:1px solid rgba(245,166,35,.3);border-radius:var(--r);padding:18px;text-align:center;position:relative;overflow:hidden;}
+.pts-balance::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--pink));}
+.pts-eyebrow{font-size:10px;font-family:'Space Mono',monospace;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
+.pts-number{font-size:48px;font-weight:800;font-family:'Space Mono',monospace;color:var(--text);line-height:1;}
+.pts-label{font-size:12px;color:var(--muted);margin-top:4px;}
+.pts-mode-toggle{margin:0 20px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3px;display:flex;}
+.pts-mode-btn{flex:1;padding:9px 6px;text-align:center;font-size:12px;font-weight:700;border-radius:9px;cursor:pointer;color:var(--muted);transition:all .2s;}
+.pts-mode-btn.active{background:var(--surface3);color:var(--text);}
+.pts-bank-card{margin:0 20px 14px;background:var(--surface);border:1px solid rgba(165,148,251,.25);border-radius:var(--r);padding:14px;}
+.pts-bank-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.pts-bank-goal{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.pts-bank-track{height:8px;background:var(--surface3);border-radius:99px;overflow:hidden;margin-bottom:8px;}
+.pts-bank-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .5s ease;}
+.pts-bank-meta{display:flex;justify-content:space-between;font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);margin-bottom:12px;}
+.pts-bank-raid{width:100%;background:transparent;border:1px solid var(--border2);border-radius:var(--rs);padding:9px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:border-color .2s;}
+.pts-bank-raid:hover{border-color:var(--amber);color:var(--amber);}
+.pts-bank-note{font-size:10px;color:var(--dim);text-align:center;margin-top:6px;font-family:'Space Mono',monospace;}
+.prize-card{margin:0 20px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s,transform .1s;position:relative;}
+.prize-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.prize-card.claimed{border-color:rgba(61,214,140,.35);opacity:.65;pointer-events:none;}
+.prize-card.cant-afford{opacity:.45;}
+.prize-emoji{font-size:24px;flex-shrink:0;width:32px;text-align:center;}
+.prize-body{flex:1;}
+.prize-name{font-size:13px;font-weight:700;line-height:1.2;}
+.prize-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.prize-cost{font-size:12px;font-family:'Space Mono',monospace;color:var(--amber);flex-shrink:0;text-align:right;}
+.prize-claimed-tag{font-size:10px;color:var(--green);font-family:'Space Mono',monospace;margin-top:2px;}
+.prize-set-goal-btn{width:100%;background:rgba(165,148,251,.12);border:1px solid rgba(165,148,251,.3);border-radius:var(--rs);padding:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--accent2);cursor:pointer;transition:opacity .15s;margin-top:2px;}
+.prize-set-goal-btn:hover{opacity:.8;}
+.pts-raid-note{margin:6px 20px 12px;font-size:11px;font-family:'Space Mono',monospace;color:var(--dim);text-align:center;}
+.prize-claim-btn{width:100%;background:var(--amber);border:none;border-radius:var(--rs);padding:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#0e0e12;cursor:pointer;margin-top:10px;transition:opacity .15s;}
+.prize-claim-btn:hover{opacity:.9;}
+.pts-spend-section{margin:0 20px 8px;display:flex;flex-direction:column;gap:8px;}
+
+/* HOME SETUP TAB */
+.hs-hero{margin:0 20px 14px;background:var(--surface);border:1px solid rgba(92,235,212,.2);border-radius:var(--r);padding:16px 16px 14px;position:relative;overflow:hidden;}
+.hs-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),var(--accent));}
+.hs-hero-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+.hs-hero-sub{font-size:12px;color:var(--muted);line-height:1.5;}
+.hs-low-toggle{margin:0 20px 14px;background:rgba(92,235,212,.08);border:1px solid rgba(92,235,212,.25);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s;}
+.hs-low-toggle:hover{border-color:var(--teal);}
+.hs-low-icon{font-size:20px;flex-shrink:0;}
+.hs-low-text{font-size:13px;font-weight:700;color:var(--teal);}
+.hs-low-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.hs-equip-card{margin:0 20px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.hs-equip-header{padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;}
+.hs-equip-header:hover{background:var(--surface2);}
+.hs-equip-emoji{font-size:22px;flex-shrink:0;width:32px;text-align:center;}
+.hs-equip-info{flex:1;}
+.hs-equip-name{font-size:14px;font-weight:700;}
+.hs-equip-when{font-size:11px;color:var(--muted);margin-top:2px;}
+.hs-equip-tag{font-size:10px;font-family:'Space Mono',monospace;border-radius:99px;padding:3px 8px;border:1px solid;flex-shrink:0;}
+.tag-passive{color:var(--teal);border-color:rgba(92,235,212,.3);background:rgba(92,235,212,.06);}
+.tag-micro{color:var(--accent2);border-color:rgba(165,148,251,.3);background:rgba(165,148,251,.06);}
+.tag-desk{color:var(--amber);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.06);}
+.hs-equip-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border);}
+.hs-equip-card.open .hs-equip-body{display:block;}
+.hs-trigger-list{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.hs-trigger{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:var(--rs);cursor:pointer;transition:background .15s;}
+.hs-trigger:hover{background:var(--surface3);}
+.hs-trigger-emoji{font-size:16px;flex-shrink:0;margin-top:1px;}
+.hs-trigger-text{font-size:12px;font-weight:700;line-height:1.3;}
+.hs-trigger-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3;}
+.hs-trigger-xp{font-size:10px;font-family:'Space Mono',monospace;color:var(--amber);margin-left:auto;flex-shrink:0;padding-top:2px;}
+.hs-equip-note{margin-top:10px;font-size:11px;color:var(--dim);line-height:1.5;font-style:italic;}
+.hs-active-card{margin:0 20px 12px;background:var(--surface2);border:1px solid rgba(92,235,212,.3);border-radius:var(--r);padding:13px 14px;display:flex;align-items:center;gap:12px;}
+.hs-active-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hs-active-text{font-size:13px;font-weight:700;color:var(--teal);flex:1;}
+.hs-active-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.hs-active-stop{font-size:11px;font-family:'Space Mono',monospace;color:var(--dim);cursor:pointer;padding:4px 8px;}
+.hs-swim-card{margin:0 20px 14px;background:var(--surface);border:1px solid rgba(165,148,251,.2);border-radius:var(--r);padding:14px;}
+.hs-swim-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.hs-swim-sub{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;}
+.hs-swim-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.hs-swim-chip{background:var(--surface2);border:1px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <div class="brand-name">Accidental Fitness</div>
+    <div class="brand-tag">Well... That Counts</div>
+  </div>
+  <div class="xp-pill"><div class="xp-dot"></div><span id="xp-display">1,240 XP</span></div>
+</div>
+<div class="xp-section">
+  <div class="xp-label"><span>LVL 4 — Accidental Athlete</span><span id="xp-frac">1240 / 2000</span></div>
+  <div class="xp-track"><div class="xp-fill" id="xp-fill"></div></div>
+</div>
+<div class="streak-row">
+  <div class="streak-pill active"><div class="streak-icon">⚡</div><div class="streak-num" id="s-move">5</div><div class="streak-label">day streak</div></div>
+  <div class="streak-pill"><div class="streak-icon">💧</div><div class="streak-num" id="s-water">4</div><div class="streak-label">hydrated</div></div>
+  <div class="streak-pill"><div class="streak-icon">🛡</div><div class="streak-label">grace days</div><div class="streak-grace" id="grace-count">2 left</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('today')">Today</div>
+  <div class="tab" onclick="switchTab('move')">Move</div>
+  <div class="tab" onclick="switchTab('fuel')">Fuel</div>
+  <div class="tab" onclick="switchTab('bribe')">Bribe</div>
+  <div class="tab" onclick="switchTab('quest')">Side Quest</div>
+  <div class="tab" onclick="switchTab('prizes')">Prizes</div>
+  <div class="tab" onclick="switchTab('home')">Home Setup</div>
+</div>
+
+<!-- ====== TODAY ====== -->
+<div id="tab-today">
+
+  <!-- STAND NUDGE -->
+  <div class="nudge-card" id="stand-nudge">
+    <div class="nudge-icon">🪑</div>
+    <div>
+      <div class="nudge-text">Still for 67 minutes</div>
+      <div class="nudge-sub">Standing up counts. So does stretching in your chair.</div>
+    </div>
+    <div class="nudge-dismiss" onclick="dismissNudge('stand-nudge')">ok</div>
+  </div>
+
+  <!-- WATER NUDGE -->
+  <div class="water-nudge" id="water-nudge">
+    <div class="water-icon">💧</div>
+    <div>
+      <div class="water-text">Last drink was 2 hrs ago</div>
+      <div class="water-sub">Even a sip counts</div>
+    </div>
+    <div class="water-log-btn" onclick="logWater('Sip from nudge')">I drank</div>
+  </div>
+
+  <!-- ENERGY CHECK -->
+  <div class="sh"><span class="st">How's your energy right now?</span></div>
+  <div class="energy-selector">
+    <div class="energy-btn low" id="ebtn-low" onclick="selectEnergy('low')">
+      <div class="energy-icon">🌊</div>
+      <div class="energy-label">Low</div>
+      <div class="energy-desc">couch mode, minimal effort</div>
+    </div>
+    <div class="energy-btn med selected" id="ebtn-med" onclick="selectEnergy('med')">
+      <div class="energy-icon">✨</div>
+      <div class="energy-label">Medium</div>
+      <div class="energy-desc">upright, could do a thing</div>
+    </div>
+    <div class="energy-btn high" id="ebtn-high" onclick="selectEnergy('high')">
+      <div class="energy-icon">🔥</div>
+      <div class="energy-label">High</div>
+      <div class="energy-desc">actually feel like moving</div>
+    </div>
+  </div>
+
+  <!-- SUGGESTED MOVES -->
+  <div class="sh"><span class="st" id="suggest-label">Suggested for medium energy</span><span class="sl" onclick="rerollSuggest()">different one</span></div>
+
+  <div id="suggest-cards">
+    <div class="move-card med-energy" onclick="startMove('Spontaneous dance break',180,'Put on whatever, move around your space. No choreography required.',80)">
+      <div class="move-emoji">🎵</div>
+      <div class="move-body">
+        <div class="move-title">Spontaneous dance break</div>
+        <div class="move-sub">Put on whatever, move around your space</div>
+        <div class="move-meta"><span class="move-time">1-3 min</span><span class="move-xp">+80 XP</span></div>
+      </div>
+    </div>
+    <div class="move-card med-energy" onclick="startMove('Wiggle walk',300,'Walk to another room and back. Wiggle while you do it. That counts.',60)">
+      <div class="move-emoji">🚶</div>
+      <div class="move-body">
+        <div class="move-title">Wiggle walk</div>
+        <div class="move-sub">Walk to another room. Wiggle while you do it.</div>
+        <div class="move-meta"><span class="move-time">2-5 min</span><span class="move-xp">+60 XP</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HABIT TRIGGERS -->
+  <div class="sh" style="margin-top:6px"><span class="st">Triggered by your routine</span></div>
+
+  <div class="habit-section">
+    <div class="habit-header">
+      <div class="habit-emoji">🚽</div>
+      <div class="habit-name">Bathroom trip</div>
+    </div>
+    <div class="habit-chips">
+      <div class="habit-chip" onclick="stealthLog('5 calf raises','30')">5 calf raises while going</div>
+      <div class="habit-chip" onclick="stealthLog('Hand washing stretch','20')">stretch while washing hands</div>
+      <div class="habit-chip" onclick="stealthLog('Hallway shake-out','25')">shake out on the way back</div>
+    </div>
+  </div>
+
+  <div class="habit-section">
+    <div class="habit-header">
+      <div class="habit-emoji">🍽</div>
+      <div class="habit-name">Making food / microwave waiting</div>
+    </div>
+    <div class="habit-chips">
+      <div class="habit-chip" onclick="stealthLog('Counter push-ups','35')">counter push-ups while waiting</div>
+      <div class="habit-chip" onclick="stealthLog('Kitchen sway','20')">sway to music while cooking</div>
+      <div class="habit-chip" onclick="stealthLog('Fridge squat','25')">squat every time you open the fridge</div>
+    </div>
+  </div>
+
+  <div class="habit-section" style="margin-bottom:12px;">
+    <div class="habit-header">
+      <div class="habit-emoji">📱</div>
+      <div class="habit-name">Scrolling / watching TV</div>
+    </div>
+    <div class="habit-chips">
+      <div class="habit-chip" onclick="stealthLog('Ad break stretch','30')">stretch during every ad break</div>
+      <div class="habit-chip" onclick="stealthLog('Lying down leg raises','35')">leg raises lying on the couch</div>
+      <div class="habit-chip" onclick="stealthLog('Passive fidget','15')">intentional fidgeting counts</div>
+    </div>
+  </div>
+
+  <!-- ALREADY MOVING -->
+  <div class="sh"><span class="st">Already doing something?</span><span class="sl">log it</span></div>
+  <div class="stealth-grid">
+    <div class="stealth-card" onclick="stealthLog('Cleo walk','120')"><div class="stealth-emoji">🐕</div><div class="stealth-name">Cleo walk</div><div class="stealth-xp">+120 XP</div></div>
+    <div class="stealth-card" onclick="stealthLog('Power chores','100')"><div class="stealth-emoji">🧹</div><div class="stealth-name">Power chores</div><div class="stealth-xp">+100 XP</div></div>
+    <div class="stealth-card" onclick="stealthLog('Dancing around','80')"><div class="stealth-emoji">🎵</div><div class="stealth-name">Dancing around</div><div class="stealth-xp">+80 XP</div></div>
+    <div class="stealth-card" onclick="stealthLog('Just walked somewhere','70')"><div class="stealth-emoji">🚶</div><div class="stealth-name">Just walked somewhere</div><div class="stealth-xp">+70 XP</div></div>
+    <div class="stealth-card" onclick="stealthLog('Pacing while thinking','50')"><div class="stealth-emoji">🤔</div><div class="stealth-name">Pacing while thinking</div><div class="stealth-xp">+50 XP</div></div>
+    <div class="stealth-card" onclick="stealthLog('Fidgeting a lot','30')"><div class="stealth-emoji">🤙</div><div class="stealth-name">Fidgeting a lot</div><div class="stealth-xp">+30 XP</div></div>
+  </div>
+
+</div>
+
+<!-- ====== MOVE ====== -->
+<div id="tab-move" class="hidden">
+
+  <!-- ACTIVE TIMER -->
+  <div class="timer-card hidden" id="timer-card">
+    <div class="timer-label" id="timer-label">Dance break</div>
+    <div class="timer-display" id="timer-display">3:00</div>
+    <div class="timer-desc" id="timer-desc">Move however feels good</div>
+    <div class="timer-btns">
+      <button class="timer-btn pause" id="timer-pause-btn" onclick="pauseTimer()">Pause</button>
+      <button class="timer-btn done" onclick="stopTimer()">Done! ⚡</button>
+    </div>
+  </div>
+
+  <!-- LOW ENERGY -->
+  <div class="sh"><span class="st">Low energy</span><span class="pill pill-low">couch is fine</span></div>
+  <div class="move-card low-energy" onclick="startMove('Legs up the wall',300,'Lie on the floor, legs up the wall. Just breathe. That is the move.',70)"><div class="move-emoji">🛋</div><div class="move-body"><div class="move-title">Legs up the wall</div><div class="move-sub">Lie down, legs up. Just breathe. That is the move.</div><div class="move-meta"><span class="move-time">5 min</span><span class="move-xp">+70 XP</span></div></div></div>
+  <div class="move-card low-energy" onclick="startMove('Lying stretch',180,'Full body stretch on the floor or bed. Move whatever feels tight.',50)"><div class="move-emoji">😴</div><div class="move-body"><div class="move-title">Lying stretch</div><div class="move-sub">Floor or bed. Move whatever feels tight.</div><div class="move-meta"><span class="move-time">1-3 min</span><span class="move-xp">+50 XP</span></div></div></div>
+  <div class="move-card low-energy" onclick="startMove('Intentional fidget',120,'Shake your hands. Roll your ankles. Neck rolls. All of it counts.',30)"><div class="move-emoji">🤙</div><div class="move-body"><div class="move-title">Intentional fidget</div><div class="move-sub">Shake hands, roll ankles, neck rolls. All counts.</div><div class="move-meta"><span class="move-time">2 min</span><span class="move-xp">+30 XP</span></div></div></div>
+  <div class="move-card low-energy" onclick="stealthLog('Stand up and back down','20')"><div class="move-emoji">🧍</div><div class="move-body"><div class="move-title">Stand up and sit back down</div><div class="move-sub">That is genuinely it. You stood. It counts.</div><div class="move-meta"><span class="move-time">10 sec</span><span class="move-xp">+20 XP</span></div></div></div>
+
+  <!-- MEDIUM ENERGY -->
+  <div class="sh" style="margin-top:6px"><span class="st">Medium energy</span><span class="pill pill-med">upright mode</span></div>
+  <div class="move-card med-energy" onclick="startMove('Spontaneous dance break',180,'Put on whatever song. Move around your space. No choreography required.',80)"><div class="move-emoji">🎵</div><div class="move-body"><div class="move-title">Spontaneous dance break</div><div class="move-sub">Put on whatever. Move around. No choreography.</div><div class="move-meta"><span class="move-time">1-3 min</span><span class="move-xp">+80 XP</span></div></div></div>
+  <div class="move-card med-energy" onclick="startMove('Floor stretch session',600,'Lie down. Stretch things. TV on is completely fine.',100)"><div class="move-emoji">🧘</div><div class="move-body"><div class="move-title">Floor stretch session</div><div class="move-sub">Lie down. Stretch things. TV on is fine.</div><div class="move-meta"><span class="move-time">10 min</span><span class="move-xp">+100 XP</span></div></div></div>
+  <div class="move-card med-energy" onclick="startMove('Cleo walk',0,'Podcast in, brain off, just walk.',120)"><div class="move-emoji">🐕</div><div class="move-body"><div class="move-title">Cleo walk</div><div class="move-sub">Podcast in, brain off, just walk</div><div class="move-meta"><span class="move-time">any length</span><span class="move-xp">+120 XP</span></div></div></div>
+  <div class="move-card med-energy" onclick="startMove('Power chore sprint',900,'Clean fast, music loud, timer on. Stop when it ends.',100)"><div class="move-emoji">🧹</div><div class="move-body"><div class="move-title">Power chore sprint</div><div class="move-sub">Clean fast, music loud, timer on. Stop when it ends.</div><div class="move-meta"><span class="move-time">15 min</span><span class="move-xp">+100 XP</span></div></div></div>
+
+  <!-- HIGH ENERGY -->
+  <div class="sh" style="margin-top:6px"><span class="st">High energy</span><span class="pill pill-high">actually want to move</span></div>
+  <div class="move-card high-energy" onclick="startMove('Chaos burst',300,'Jump, spin, shake — full chaos mode. No rules.',80)"><div class="move-emoji">💥</div><div class="move-body"><div class="move-title">Chaos burst</div><div class="move-sub">Jump, spin, shake. Full chaos. No rules.</div><div class="move-meta"><span class="move-time">5 min</span><span class="move-xp">+80 XP</span></div></div></div>
+  <div class="move-card high-energy" onclick="startMove('Outside loop',600,'Around the block, no plan. Turn around whenever.',90)"><div class="move-emoji">🌤</div><div class="move-body"><div class="move-title">Quick outside loop</div><div class="move-sub">Around the block. Turn around whenever.</div><div class="move-meta"><span class="move-time">10 min</span><span class="move-xp">+90 XP</span></div></div></div>
+  <div class="move-card high-energy" onclick="startMove('3 song dance session',600,'3 songs. Kitchen. Go completely feral.',120)"><div class="move-emoji">🔥</div><div class="move-body"><div class="move-title">3 song dance session</div><div class="move-sub">3 songs. Kitchen. Go completely feral.</div><div class="move-meta"><span class="move-time">10 min</span><span class="move-xp">+120 XP</span></div></div></div>
+
+</div>
+
+<!-- ====== FUEL ====== -->
+<div id="tab-fuel" class="hidden">
+
+  <!-- HYDRATION CARD -->
+  <div class="sh"><span class="st">Hydration</span><span class="pill pill-low">brain needs water</span></div>
+  <div class="hydration-card">
+    <div class="hydration-top">
+      <div>
+        <div class="hydration-title">Water today</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="water-count-label">3 of 8 glasses</div>
+      </div>
+      <div class="hydration-since" id="water-since">2h since last drink</div>
+    </div>
+    <div class="hydration-track"><div class="hydration-fill" id="water-fill" style="width:37.5%"></div></div>
+    <div class="hydration-label"><span id="water-label-text">3 / 8 glasses</span><span style="color:var(--teal)">goal: 8</span></div>
+    <div class="hydration-btns">
+      <div class="hydration-btn primary" onclick="logWater('Full glass')">+ Full glass</div>
+      <div class="hydration-btn" onclick="logWater('Half glass')">+ Half glass</div>
+      <div class="hydration-btn" onclick="logWater('Just a sip')">+ Sip</div>
+    </div>
+  </div>
+
+  <!-- BRAIN FUEL -->
+  <div class="sh"><span class="st">Brain fuel today</span><span class="pill pill-green">on track</span></div>
+  <div class="fuel-card">
+    <div class="fuel-header"><div><div class="fuel-title">How you are fueled</div><div class="fuel-subtitle" id="meal-count-label">1 meal logged so far</div></div></div>
+    <div class="fuel-rings">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#252535" stroke-width="6"/><circle cx="30" cy="30" r="24" fill="none" stroke="#5cebd4" stroke-width="6" stroke-dasharray="150.8" stroke-dashoffset="87.5" stroke-linecap="round" transform="rotate(-90 30 30)"/><text x="30" y="34" text-anchor="middle" fill="#f0eeff" font-family="Space Mono,monospace" font-size="11" font-weight="700">42g</text></svg>
+        <div class="ring-label">Protein</div><div class="ring-status status-low">needs more</div>
+      </div>
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#252535" stroke-width="6"/><circle cx="30" cy="30" r="24" fill="none" stroke="#f5a623" stroke-width="6" stroke-dasharray="150.8" stroke-dashoffset="105.6" stroke-linecap="round" transform="rotate(-90 30 30)"/><text x="30" y="34" text-anchor="middle" fill="#f0eeff" font-family="Space Mono,monospace" font-size="11" font-weight="700">60g</text></svg>
+        <div class="ring-label">Carbs</div><div class="ring-status status-low">needs more</div>
+      </div>
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#252535" stroke-width="6"/><circle cx="30" cy="30" r="24" fill="none" stroke="#f06292" stroke-width="6" stroke-dasharray="150.8" stroke-dashoffset="113.1" stroke-linecap="round" transform="rotate(-90 30 30)"/><text x="30" y="34" text-anchor="middle" fill="#f0eeff" font-family="Space Mono,monospace" font-size="11" font-weight="700">14g</text></svg>
+        <div class="ring-label">Fat</div><div class="ring-status status-ok">good</div>
+      </div>
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="#252535" stroke-width="6"/><circle cx="30" cy="30" r="24" fill="none" stroke="#7c6dfa" stroke-width="6" stroke-dasharray="150.8" stroke-dashoffset="30.2" stroke-linecap="round" transform="rotate(-90 30 30)"/><text x="30" y="34" text-anchor="middle" fill="#f0eeff" font-family="Space Mono,monospace" font-size="11" font-weight="700">80%</text></svg>
+        <div class="ring-label">Hydration</div><div class="ring-status status-good">solid</div>
+      </div>
+    </div>
+    <div class="fuel-insight"><strong>Protein is low</strong> — aim for a protein-rich lunch. Focus and dopamine regulation both depend on it.</div>
+  </div>
+
+  <div class="sh"><span class="st">Brain nutrients</span><span class="pill pill-amber">ADHD essentials</span></div>
+  <div class="nutrients-card">
+    <div class="nutrient-row" onclick="toggleNutrient(this)"><div class="nutrient-icon" style="background:rgba(92,235,212,.1)">🐟</div><div><div class="nutrient-name">Omega-3s</div><div class="nutrient-why">dopamine + focus regulation</div></div><div class="nutrient-check">&#10003;</div></div>
+    <div class="nutrient-row" onclick="toggleNutrient(this)"><div class="nutrient-icon" style="background:rgba(245,166,35,.1)">🥩</div><div><div class="nutrient-name">Iron</div><div class="nutrient-why">dopamine synthesis + sleep</div></div><div class="nutrient-check">&#10003;</div></div>
+    <div class="nutrient-row" onclick="toggleNutrient(this)"><div class="nutrient-icon" style="background:rgba(165,148,251,.1)">🌻</div><div><div class="nutrient-name">Zinc</div><div class="nutrient-why">impulse control + mood</div></div><div class="nutrient-check">&#10003;</div></div>
+    <div class="nutrient-row" onclick="toggleNutrient(this)"><div class="nutrient-icon" style="background:rgba(61,214,140,.1)">🥬</div><div><div class="nutrient-name">Magnesium</div><div class="nutrient-why">calm focus + sleep quality</div></div><div class="nutrient-check">&#10003;</div></div>
+  </div>
+
+  <div class="sh" style="margin-top:4px"><span class="st">Refuel</span></div>
+  <div class="mode-toggle">
+    <div class="mode-btn active" id="mode-normal" onclick="switchFuelMode('normal')">Normal mode</div>
+    <div class="mode-btn" id="mode-spoons" onclick="switchFuelMode('spoons')">Low spoons mode</div>
+  </div>
+  <div class="log-panel" id="panel-normal">
+    <div class="log-option" onclick="logMeal('Photo snap')"><div class="lo-icon" style="background:rgba(92,235,212,.1)">📷</div><div><div class="lo-text">Snap a photo</div><div class="lo-sub">AI identifies it — zero typing</div></div><div class="lo-xp">+35 XP</div></div>
+    <div class="log-option" onclick="logMeal('Repeated meal')"><div class="lo-icon" style="background:rgba(165,148,251,.1)">⚡</div><div><div class="lo-text">Repeat last meal</div><div class="lo-sub">Same as your logged breakfast</div></div><div class="lo-xp">+25 XP</div></div>
+    <div class="log-option" onclick="logMeal('Food search')"><div class="lo-icon" style="background:rgba(255,107,107,.1)">🔍</div><div><div class="lo-text">Search foods</div><div class="lo-sub">Type or say what you ate</div></div><div class="lo-xp">+20 XP</div></div>
+  </div>
+  <div id="panel-spoons" style="display:none">
+    <div class="sh" style="padding-top:0"><span class="st" style="color:var(--amber)">No-cook, no-decision meals</span></div>
+    <div class="low-spoons">
+      <div class="spoon-card" onclick="logSpoon(this,'Overnight oats')"><div class="spoon-emoji">🥣</div><div class="spoon-name">Overnight oats</div><div class="spoon-tags"><span class="spoon-tag tag-p">protein</span><span class="spoon-tag tag-e">easy</span></div><div class="spoon-logged-badge">logged</div></div>
+      <div class="spoon-card" onclick="logSpoon(this,'Adult lunchable')"><div class="spoon-emoji">🧀</div><div class="spoon-name">Adult lunchable</div><div class="spoon-tags"><span class="spoon-tag tag-p">protein</span><span class="spoon-tag tag-z">zinc</span></div><div class="spoon-logged-badge">logged</div></div>
+      <div class="spoon-card" onclick="logSpoon(this,'Greek yogurt bowl')"><div class="spoon-emoji">🍶</div><div class="spoon-name">Greek yogurt bowl</div><div class="spoon-tags"><span class="spoon-tag tag-p">protein</span><span class="spoon-tag tag-e">easy</span></div><div class="spoon-logged-badge">logged</div></div>
+      <div class="spoon-card" onclick="logSpoon(this,'Nut butter + banana')"><div class="spoon-emoji">🍌</div><div class="spoon-name">Nut butter + banana</div><div class="spoon-tags"><span class="spoon-tag tag-o">omega-3</span><span class="spoon-tag tag-e">easy</span></div><div class="spoon-logged-badge">logged</div></div>
+      <div class="spoon-card" onclick="logSpoon(this,'Tuna + crackers')"><div class="spoon-emoji">🐟</div><div class="spoon-name">Tuna + crackers</div><div class="spoon-tags"><span class="spoon-tag tag-p">protein</span><span class="spoon-tag tag-o">omega-3</span></div><div class="spoon-logged-badge">logged</div></div>
+      <div class="spoon-card" onclick="logSpoon(this,'Instant grain bowl')"><div class="spoon-emoji">🫙</div><div class="spoon-name">Instant grain bowl</div><div class="spoon-tags"><span class="spoon-tag tag-e">easy</span><span class="spoon-tag tag-z">zinc</span></div><div class="spoon-logged-badge">logged</div></div>
+    </div>
+  </div>
+  <div class="sh"><span class="st">Today's log</span></div>
+  <div class="meal-log">
+    <div class="meal-entry"><div class="meal-circle"><div class="meal-circle-dot"></div></div><div class="meal-time">8:30 AM</div><div style="flex:1"><div class="meal-name-text">Greek yogurt bowl</div><div class="meal-tags-row"><span class="spoon-tag tag-p" style="font-size:10px">protein</span><span class="spoon-tag tag-e" style="font-size:10px">easy</span></div></div></div>
+    <div class="meal-entry" style="opacity:.5" id="slot-1"><div class="meal-circle empty"></div><div class="meal-time">12:00 PM</div><div style="flex:1"><div class="meal-add" onclick="switchFuelMode('spoons')">+ refuel now</div></div></div>
+    <div class="meal-entry" style="opacity:.5" id="slot-2"><div class="meal-circle empty"></div><div class="meal-time">3:30 PM</div><div style="flex:1"><div class="meal-add" onclick="switchFuelMode('spoons')">+ refuel now</div></div></div>
+    <div class="meal-entry" style="opacity:.5" id="slot-3"><div class="meal-circle empty"></div><div class="meal-time">7:00 PM</div><div style="flex:1"><div class="meal-add" onclick="switchFuelMode('spoons')">+ refuel now</div></div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ====== BRIBE ====== -->
+<div id="tab-bribe" class="hidden">
+
+  <div class="bribe-hero">
+    <div class="bribe-hero-title">Bribe Myself</div>
+    <div class="bribe-hero-sub">Do the thing. Pick your reward. Bare minimum counts.</div>
+  </div>
+
+  <!-- COMBO BANNER -->
+  <div class="combo-banner" id="combo-banner" style="display:none">
+    <div class="combo-icon">🎁</div>
+    <div>
+      <div class="combo-text" id="combo-text">2 tasks done — combo reward unlocked!</div>
+      <div class="combo-sub">You earned a bigger treat</div>
+    </div>
+  </div>
+
+  <!-- HYGIENE / EXEC FUNCTION -->
+  <div class="task-group-label">Executive function — small rewards</div>
+
+  <div class="task-card" id="tc-teeth">
+    <div class="task-header" onclick="toggleTask('tc-teeth')">
+      <div class="task-emoji">🦷</div>
+      <div class="task-info">
+        <div class="task-name">Brush teeth</div>
+        <div class="task-bare">bare minimum: 30 seconds counts</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">small reward</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>30 seconds. One side only. Rinse. Done. That counts and you know it.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-teeth','Brush teeth','bare','Brushed teeth (quick)')">I did the bare minimum</div>
+        <div class="task-btn full" onclick="completeTask('tc-teeth','Brush teeth','full','Brushed teeth properly')">I did the full thing</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card" id="tc-shower">
+    <div class="task-header" onclick="toggleTask('tc-shower')">
+      <div class="task-emoji">🚿</div>
+      <div class="task-info">
+        <div class="task-name">Shower</div>
+        <div class="task-bare">bare minimum: rinse only, 2 min</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">small reward</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>Get in. Get wet. Get out. No hair washing required. 2 minutes is a shower.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-shower','Shower','bare','Quick rinse')">Rinse only</div>
+        <div class="task-btn full" onclick="completeTask('tc-shower','Shower','full','Full shower')">Full shower</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card" id="tc-shave">
+    <div class="task-header" onclick="toggleTask('tc-shave')">
+      <div class="task-emoji">🪒</div>
+      <div class="task-info">
+        <div class="task-name">Shave</div>
+        <div class="task-bare">bare minimum: one area only</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">small reward</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>Just do one area. Legs, face, wherever. One spot and done is valid.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-shave','Shave','bare','Partial shave')">One area only</div>
+        <div class="task-btn full" onclick="completeTask('tc-shave','Shave','full','Full shave')">Full shave</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIGH RESISTANCE -->
+  <div class="task-group-label" style="margin-top:8px">High resistance — medium rewards</div>
+
+  <div class="task-card" id="tc-litter">
+    <div class="task-header" onclick="toggleTask('tc-litter')">
+      <div class="task-emoji">🐱</div>
+      <div class="task-info">
+        <div class="task-name">Change litter box</div>
+        <div class="task-bare">bare minimum: scoop only, no full change</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">medium reward</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>Just scoop. Leave the bag next to it. Come back for the full change later. Scoop counts.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-litter','Litter box','bare','Scooped only')">Scooped it</div>
+        <div class="task-btn full" onclick="completeTask('tc-litter','Litter box','full','Full litter change')">Full change</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card" id="tc-shower-clean">
+    <div class="task-header" onclick="toggleTask('tc-shower-clean')">
+      <div class="task-emoji">🧽</div>
+      <div class="task-info">
+        <div class="task-name">Clean shower</div>
+        <div class="task-bare">bare minimum: spray and leave it</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">medium reward</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>Spray the cleaner. Walk away. Come back in 5 minutes and rinse. That is genuinely enough.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-shower-clean','Clean shower','bare','Sprayed and rinsed')">Sprayed it</div>
+        <div class="task-btn full" onclick="completeTask('tc-shower-clean','Clean shower','full','Full scrub')">Full scrub</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="task-card" id="tc-bedding">
+    <div class="task-header" onclick="toggleTask('tc-bedding')">
+      <div class="task-emoji">🛏</div>
+      <div class="task-info">
+        <div class="task-name">Change bedding</div>
+        <div class="task-bare">bare minimum: just the pillowcase</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">medium reward</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>Change one pillowcase. That is the smallest valid version and it still counts as doing the thing.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-bedding','Change bedding','bare','Changed pillowcase')">Pillowcase only</div>
+        <div class="task-btn full" onclick="completeTask('tc-bedding','Change bedding','full','Full bed change')">Full change</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVOIDED WORK -->
+  <div class="task-group-label" style="margin-top:8px">Avoided work tasks — break is the reward</div>
+
+  <div class="task-card" id="tc-work">
+    <div class="task-header" onclick="toggleTask('tc-work')">
+      <div class="task-emoji">💻</div>
+      <div class="task-info">
+        <div class="task-name">The work task you've been avoiding</div>
+        <div class="task-bare">bare minimum: 5 minutes, then stop</div>
+      </div>
+      <div class="task-right">
+        <div class="task-reward-tag">no-work break</div>
+        <div class="task-expand">›</div>
+      </div>
+    </div>
+    <div class="task-body">
+      <div class="task-nope"><strong>I really don't want to</strong>Open the thing. Do 5 minutes. Close it. You are allowed to stop. Starting is the whole task.</div>
+      <div class="task-btns">
+        <div class="task-btn bare" onclick="completeTask('tc-work','Avoided work task','work-bare','5 min of work done')">I did 5 minutes</div>
+        <div class="task-btn full" onclick="completeTask('tc-work','Avoided work task','work-full','Completed avoided task')">I finished it</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- REWARD MODAL -->
+<div class="reward-overlay" id="reward-overlay" onclick="closeRewardIfOutside(event)">
+  <div class="reward-sheet">
+    <div class="reward-handle"></div>
+    <div class="reward-title">You did it. Pick your reward.</div>
+    <div class="reward-task-name" id="reward-task-name">Brush teeth</div>
+    <div class="reward-grid" id="reward-grid"></div>
+    <button class="reward-confirm" id="reward-confirm" onclick="claimReward()">Claim this reward</button>
+    <span class="reward-close" onclick="closeReward()">skip reward</span>
+  </div>
+</div>
+
+<!-- ====== SIDE QUEST ====== -->
+<div id="tab-quest" class="hidden">
+
+  <!-- CHECK-IN DONE STATE -->
+  <div class="sq-checkin-done" id="sq-done">
+    <div class="sq-done-title">You went. That's it. That counts.</div>
+    <div class="sq-done-sub">Doesn't matter how long you stayed or what you did.<br>Showing up was the whole task.</div>
+  </div>
+
+  <!-- HERO CARD -->
+  <div class="sq-hero">
+    <div class="sq-hero-eyebrow">Side Quest — optional, no pressure</div>
+    <div class="sq-hero-title">Orem Recreation Center</div>
+    <div class="sq-hero-sub">This is not a workout. It is a place you can go. You do not have to do anything when you get there.</div>
+    <div class="sq-hero-address">768 W 400 N, Orem UT · open 5:30am–10pm</div>
+    <button class="sq-checkin-btn" id="sq-checkin-btn" onclick="sqCheckIn()">I went ⚡</button>
+  </div>
+
+  <!-- THE RULES -->
+  <div class="sq-rule"><strong>The only rule:</strong> Showing up counts as success. Leaving after 5 minutes counts. Sitting in the lobby counts. You do not owe anyone a workout.</div>
+
+  <!-- LOW-FRICTION NUDGES -->
+  <div class="sh"><span class="st">Just go for 5 minutes</span><span class="pill pill-low">no commitment</span></div>
+
+  <div class="sq-nudge-card" onclick="sqSelectNudge(this,'5 minute visit')">
+    <div class="sq-nudge-emoji">5️⃣</div>
+    <div>
+      <div class="sq-nudge-title">Just 5 minutes</div>
+      <div class="sq-nudge-sub">Go in. Walk around. Leave. Full success.</div>
+    </div>
+    <div class="sq-nudge-tag">+80 XP</div>
+  </div>
+
+  <div class="sq-nudge-card" onclick="sqSelectNudge(this,'Phone in pocket visit')">
+    <div class="sq-nudge-emoji">📱</div>
+    <div>
+      <div class="sq-nudge-title">Phone in your pocket the whole time</div>
+      <div class="sq-nudge-sub">Scroll while you walk. That is allowed.</div>
+    </div>
+    <div class="sq-nudge-tag">+90 XP</div>
+  </div>
+
+  <div class="sq-nudge-card" onclick="sqSelectNudge(this,'Hot tub sit')">
+    <div class="sq-nudge-emoji">♨️</div>
+    <div>
+      <div class="sq-nudge-title">Just use the hot tub</div>
+      <div class="sq-nudge-sub">Sit. Warm up. Leave when you want.</div>
+    </div>
+    <div class="sq-nudge-tag">+100 XP</div>
+  </div>
+
+  <div class="sq-nudge-card" onclick="sqSelectNudge(this,'Mood boost visit')">
+    <div class="sq-nudge-emoji">🌤</div>
+    <div>
+      <div class="sq-nudge-title">I need a mood reset</div>
+      <div class="sq-nudge-sub">Change of location, not a workout. Leave after.</div>
+    </div>
+    <div class="sq-nudge-tag">+80 XP</div>
+  </div>
+
+  <!-- OPTIONAL ACTIVITIES -->
+  <div class="sh" style="margin-top:4px"><span class="st">If you feel like it (optional)</span></div>
+
+  <div class="sq-activity-grid">
+    <div class="sq-activity" onclick="sqPickActivity(this)">
+      <div class="sq-activity-emoji">🚶</div>
+      <div class="sq-activity-name">Walk around</div>
+      <div class="sq-activity-note">Track or hallways, any pace</div>
+    </div>
+    <div class="sq-activity" onclick="sqPickActivity(this)">
+      <div class="sq-activity-emoji">🧘</div>
+      <div class="sq-activity-name">Stretch</div>
+      <div class="sq-activity-note">Floor or mat, no routine needed</div>
+    </div>
+    <div class="sq-activity" onclick="sqPickActivity(this)">
+      <div class="sq-activity-emoji">♨️</div>
+      <div class="sq-activity-name">Hot tub</div>
+      <div class="sq-activity-note">Just sit. That is valid.</div>
+    </div>
+    <div class="sq-activity" onclick="sqPickActivity(this)">
+      <div class="sq-activity-emoji">🧖</div>
+      <div class="sq-activity-name">Sauna</div>
+      <div class="sq-activity-note">Warm, quiet, low effort</div>
+    </div>
+    <div class="sq-activity" onclick="sqPickActivity(this)">
+      <div class="sq-activity-emoji">🏊</div>
+      <div class="sq-activity-name">Pool float</div>
+      <div class="sq-activity-note">Float counts. Laps optional.</div>
+    </div>
+    <div class="sq-activity" onclick="sqPickActivity(this)">
+      <div class="sq-activity-emoji">🪑</div>
+      <div class="sq-activity-name">Just sit there</div>
+      <div class="sq-activity-note">Change of scenery. Valid.</div>
+    </div>
+  </div>
+
+  <!-- PAIR WITH A REWARD -->
+  <div class="sq-reward-pair">
+    <div class="sq-reward-header">
+      <div style="font-size:18px">🎁</div>
+      <div class="sq-reward-title">Pair your visit with a reward</div>
+    </div>
+    <div class="sq-reward-chips">
+      <div class="sq-chip" onclick="sqToggleReward(this)">guilt-free scroll while there</div>
+      <div class="sq-chip" onclick="sqToggleReward(this)">episode waiting when I get home</div>
+      <div class="sq-chip" onclick="sqToggleReward(this)">no-work break after</div>
+      <div class="sq-chip" onclick="sqToggleReward(this)">Amazon browse when I'm back</div>
+      <div class="sq-chip" onclick="sqToggleReward(this)">coloring time after</div>
+      <div class="sq-chip" onclick="sqToggleReward(this)">gaming session when home</div>
+    </div>
+  </div>
+
+  <!-- MOOD FRAMING -->
+  <div class="sh" style="margin-top:4px"><span class="st">Why bother going?</span></div>
+  <div style="margin:0 20px 14px;display:flex;flex-direction:column;gap:8px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="font-size:20px;flex-shrink:0;">🧠</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Mood shift, not fitness</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;">A change of location genuinely changes your brain state. You do not need to exercise for this to work.</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="font-size:20px;flex-shrink:0;">⚡</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Dopamine from novelty</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;">Being somewhere different — even briefly — gives your brain a novelty hit. That is a legitimate reason to go.</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="font-size:20px;flex-shrink:0;">🛁</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px;">Warm water is genuinely good for you</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;">Hot tub or sauna time reduces cortisol and helps with sensory regulation. Sitting there is doing something.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====== PRIZES ====== -->
+<div id="tab-prizes" class="hidden">
+
+  <!-- POINTS BALANCE -->
+  <div class="pts-balance">
+    <div class="pts-eyebrow">Your points</div>
+    <div class="pts-number" id="pts-display">340</div>
+    <div class="pts-label">earned today — spend or bank them</div>
+  </div>
+
+  <!-- SPEND / BANK TOGGLE -->
+  <div class="pts-mode-toggle">
+    <div class="pts-mode-btn active" id="pts-spend-btn" onclick="switchPrizeMode('spend')">Spend tonight</div>
+    <div class="pts-mode-btn" id="pts-bank-btn" onclick="switchPrizeMode('bank')">Bank for later</div>
+  </div>
+
+  <!-- SPEND PANEL -->
+  <div id="pts-panel-spend">
+    <div class="sh"><span class="st">Small rewards — spend now</span><span class="pill pill-amber">immediate</span></div>
+    <div class="pts-spend-section" id="spend-cards"></div>
+  </div>
+
+  <!-- BANK PANEL -->
+  <div id="pts-panel-bank" style="display:none">
+
+    <!-- ACTIVE GOAL -->
+    <div class="pts-bank-card" id="bank-goal-card">
+      <div class="pts-bank-title" id="bank-goal-name">No goal set yet</div>
+      <div class="pts-bank-goal" id="bank-goal-desc">Pick something below to save toward</div>
+      <div class="pts-bank-track"><div class="pts-bank-fill" id="bank-fill" style="width:0%"></div></div>
+      <div class="pts-bank-meta"><span id="bank-saved-label">0 pts banked</span><span id="bank-goal-label">goal: —</span></div>
+      <button class="pts-bank-raid" onclick="raidBank()">Raid the bank early</button>
+      <div class="pts-bank-note">raiding is allowed. no penalty. you earned these.</div>
+    </div>
+
+    <div class="sh" style="margin-top:4px"><span class="st">Pick your big prize</span><span class="pill pill-accent">save toward it</span></div>
+    <div id="bank-cards"></div>
+  </div>
+
+</div>
+
+<!-- ====== HOME SETUP ====== -->
+<div id="tab-home" class="hidden">
+
+  <div class="hs-hero">
+    <div class="hs-hero-title">Accidental movement — home edition</div>
+    <div class="hs-hero-sub">Your equipment is already out. You do not need to set anything up. Movement happens while you do other things.</div>
+  </div>
+
+  <!-- ACTIVE SESSION INDICATOR (hidden by default) -->
+  <div class="hs-active-card hidden" id="hs-active">
+    <div class="hs-active-dot"></div>
+    <div>
+      <div class="hs-active-text" id="hs-active-text">Stepper running</div>
+      <div class="hs-active-sub">Stop whenever. No minimum.</div>
+    </div>
+    <div class="hs-active-stop" onclick="hsStopActive()">done</div>
+  </div>
+
+  <!-- LOW EFFORT MODE -->
+  <div class="hs-low-toggle" onclick="hsLowEffortMode()">
+    <div class="hs-low-icon">🌊</div>
+    <div>
+      <div class="hs-low-text">Low effort mode</div>
+      <div class="hs-low-sub">Show me the easiest possible thing right now</div>
+    </div>
+  </div>
+
+  <!-- UNDER DESK STEPPER -->
+  <div class="hs-equip-card" id="hse-stepper">
+    <div class="hs-equip-header" onclick="hsToggle('hse-stepper')">
+      <div class="hs-equip-emoji">🦶</div>
+      <div class="hs-equip-info">
+        <div class="hs-equip-name">Under desk stepper</div>
+        <div class="hs-equip-when">while sitting — zero setup</div>
+      </div>
+      <span class="hs-equip-tag tag-passive">passive</span>
+    </div>
+    <div class="hs-equip-body">
+      <div class="hs-trigger-list">
+        <div class="hs-trigger" onclick="hsLog('Stepping while working','40')">
+          <div class="hs-trigger-emoji">💻</div>
+          <div><div class="hs-trigger-text">Working at desk</div><div class="hs-trigger-sub">Feet on stepper. Step while you work. No goal.</div></div>
+          <div class="hs-trigger-xp">+40 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Stepping while scrolling','30')">
+          <div class="hs-trigger-emoji">📱</div>
+          <div><div class="hs-trigger-text">Scrolling or watching something</div><div class="hs-trigger-sub">Phone out, feet moving. Background activity.</div></div>
+          <div class="hs-trigger-xp">+30 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Just stepped for a bit','25')">
+          <div class="hs-trigger-emoji">🌊</div>
+          <div><div class="hs-trigger-text">Low effort — just step for a minute</div><div class="hs-trigger-sub">One minute. Or less. Either is fine.</div></div>
+          <div class="hs-trigger-xp">+25 XP</div>
+        </div>
+      </div>
+      <div class="hs-equip-note">No time goal. No step count. While sitting = stepper can be on. That is the whole system.</div>
+    </div>
+  </div>
+
+  <!-- STANDING DESK -->
+  <div class="hs-equip-card" id="hse-desk">
+    <div class="hs-equip-header" onclick="hsToggle('hse-desk')">
+      <div class="hs-equip-emoji">🖥</div>
+      <div class="hs-equip-info">
+        <div class="hs-equip-name">Standing desk</div>
+        <div class="hs-equip-when">switch whenever — no schedule</div>
+      </div>
+      <span class="hs-equip-tag tag-desk">desk switch</span>
+    </div>
+    <div class="hs-equip-body">
+      <div class="hs-trigger-list">
+        <div class="hs-trigger" onclick="hsLog('Switched to standing','35')">
+          <div class="hs-trigger-emoji">🧍</div>
+          <div><div class="hs-trigger-text">Just switched to standing</div><div class="hs-trigger-sub">No timer. Sit back down whenever you want.</div></div>
+          <div class="hs-trigger-xp">+35 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Stood for a few minutes','30')">
+          <div class="hs-trigger-emoji">⏱</div>
+          <div><div class="hs-trigger-text">Stood for a few minutes</div><div class="hs-trigger-sub">That is it. Nothing else required.</div></div>
+          <div class="hs-trigger-xp">+30 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Stepper + standing desk combo','60')">
+          <div class="hs-trigger-emoji">🦶</div>
+          <div><div class="hs-trigger-text">Standing + stepper at the same time</div><div class="hs-trigger-sub">Bonus combo. Still totally passive.</div></div>
+          <div class="hs-trigger-xp">+60 XP</div>
+        </div>
+      </div>
+      <div class="hs-equip-note">No sit-stand schedule. Switch when you feel like it. Sitting down is always allowed.</div>
+    </div>
+  </div>
+
+  <!-- KEGEL BALLS -->
+  <div class="hs-equip-card" id="hse-kegel">
+    <div class="hs-equip-header" onclick="hsToggle('hse-kegel')">
+      <div class="hs-equip-emoji">🔵</div>
+      <div class="hs-equip-info">
+        <div class="hs-equip-name">Kegel balls</div>
+        <div class="hs-equip-when">fully passive — invisible movement</div>
+      </div>
+      <span class="hs-equip-tag tag-passive">passive</span>
+    </div>
+    <div class="hs-equip-body">
+      <div class="hs-trigger-list">
+        <div class="hs-trigger" onclick="hsLog('Wearing during work session','40')">
+          <div class="hs-trigger-emoji">💻</div>
+          <div><div class="hs-trigger-text">During a work session</div><div class="hs-trigger-sub">No behavior change required. Completely invisible.</div></div>
+          <div class="hs-trigger-xp">+40 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Wearing on a walk','35')">
+          <div class="hs-trigger-emoji">🚶</div>
+          <div><div class="hs-trigger-text">While walking around</div><div class="hs-trigger-sub">Normal activity. Passive engagement throughout.</div></div>
+          <div class="hs-trigger-xp">+35 XP</div>
+        </div>
+      </div>
+      <div class="hs-equip-note">No tracking, no reps, no visible behavior. You are just wearing them. Log it and move on.</div>
+    </div>
+  </div>
+
+  <!-- THIGH TONER -->
+  <div class="hs-equip-card" id="hse-thigh">
+    <div class="hs-equip-header" onclick="hsToggle('hse-thigh')">
+      <div class="hs-equip-emoji">🦵</div>
+      <div class="hs-equip-info">
+        <div class="hs-equip-name">Thigh toner</div>
+        <div class="hs-equip-when">while sitting — no effort required</div>
+      </div>
+      <span class="hs-equip-tag tag-passive">passive</span>
+    </div>
+    <div class="hs-equip-body">
+      <div class="hs-trigger-list">
+        <div class="hs-trigger" onclick="hsLog('Thigh toner during show','30')">
+          <div class="hs-trigger-emoji">📺</div>
+          <div><div class="hs-trigger-text">Watching a show</div><div class="hs-trigger-sub">Squeeze whenever. No rep count. Stop when you forget about it.</div></div>
+          <div class="hs-trigger-xp">+30 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Thigh toner while working','30')">
+          <div class="hs-trigger-emoji">💻</div>
+          <div><div class="hs-trigger-text">Working at desk</div><div class="hs-trigger-sub">Between thighs while you type. Invisible and passive.</div></div>
+          <div class="hs-trigger-xp">+30 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Quick squeeze burst','20')">
+          <div class="hs-trigger-emoji">⚡</div>
+          <div><div class="hs-trigger-text">Quick squeeze burst</div><div class="hs-trigger-sub">A few squeezes right now. That counts.</div></div>
+          <div class="hs-trigger-xp">+20 XP</div>
+        </div>
+      </div>
+      <div class="hs-equip-note">No rep requirement. Squeeze when you remember, stop when you forget. Both are fine.</div>
+    </div>
+  </div>
+
+  <!-- DUMBBELLS -->
+  <div class="hs-equip-card" id="hse-dumbbells">
+    <div class="hs-equip-header" onclick="hsToggle('hse-dumbbells')">
+      <div class="hs-equip-emoji">🏋</div>
+      <div class="hs-equip-info">
+        <div class="hs-equip-name">Dumbbells</div>
+        <div class="hs-equip-when">micro-actions only — 3 to 5 reps max</div>
+      </div>
+      <span class="hs-equip-tag tag-micro">micro</span>
+    </div>
+    <div class="hs-equip-body">
+      <div class="hs-trigger-list">
+        <div class="hs-trigger" onclick="hsLog('Curls before sitting down','35')">
+          <div class="hs-trigger-emoji">🪑</div>
+          <div><div class="hs-trigger-text">Before sitting down</div><div class="hs-trigger-sub">3-5 curls. Then sit. That was a set.</div></div>
+          <div class="hs-trigger-xp">+35 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Press after standing up','35')">
+          <div class="hs-trigger-emoji">🧍</div>
+          <div><div class="hs-trigger-text">After standing up</div><div class="hs-trigger-sub">Grab them, press 3-5 times, put them down. Done.</div></div>
+          <div class="hs-trigger-xp">+35 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Hold dumbbells once','20')">
+          <div class="hs-trigger-emoji">🌊</div>
+          <div><div class="hs-trigger-text">Low effort — just hold them</div><div class="hs-trigger-sub">Pick them up. Hold for a few seconds. Put them down. Counts.</div></div>
+          <div class="hs-trigger-xp">+20 XP</div>
+        </div>
+        <div class="hs-trigger" onclick="hsLog('Dumbbell micro set','40')">
+          <div class="hs-trigger-emoji">📺</div>
+          <div><div class="hs-trigger-text">During ad break or loading screen</div><div class="hs-trigger-sub">One quick set. Whatever feels easy right now.</div></div>
+          <div class="hs-trigger-xp">+40 XP</div>
+        </div>
+      </div>
+      <div class="hs-equip-note">No full workouts. No rep counting pressure. 3-5 reps triggered by something you were already doing is the whole approach.</div>
+    </div>
+  </div>
+
+  <!-- SWIMMING -->
+  <div class="sh" style="margin-top:4px"><span class="st">Swimming — optional only</span><span class="pill pill-accent">no pressure</span></div>
+  <div class="hs-swim-card">
+    <div class="hs-swim-title">Orem Rec pool — when you feel like it</div>
+    <div class="hs-swim-sub">Swimming is genuinely great but completely optional. Protect your dye first. Go when the mood hits, not on a schedule.</div>
+    <div class="hs-swim-chips">
+      <div class="hs-swim-chip">swim cap protects color</div>
+      <div class="hs-swim-chip">pre-wet hair before pool</div>
+      <div class="hs-swim-chip">conditioner barrier helps</div>
+      <div class="hs-swim-chip">chlorine-neutralizing shampoo after</div>
+      <div class="hs-swim-chip">floating counts as swimming</div>
+      <div class="hs-swim-chip">hot tub instead is valid</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-today" onclick="switchTab('today')"><div class="nav-icon">🏠</div><div class="nav-label">Today</div></div>
+  <div class="nav-item" id="nav-move" onclick="switchTab('move')"><div class="nav-icon">🎯</div><div class="nav-label">Move</div></div>
+  <div class="nav-item" id="nav-fuel" onclick="switchTab('fuel')"><div class="nav-icon">🍽</div><div class="nav-label">Fuel</div></div>
+  <div class="nav-item" id="nav-bribe" onclick="switchTab('bribe')"><div class="nav-icon">🎁</div><div class="nav-label">Bribe</div></div>
+  <div class="nav-item" id="nav-quest" onclick="switchTab('quest')"><div class="nav-icon">🗺</div><div class="nav-label">Quest</div></div>
+  <div class="nav-item" id="nav-prizes" onclick="switchTab('prizes')"><div class="nav-icon">🏆</div><div class="nav-label">Prizes</div></div>
+  <div class="nav-item" id="nav-home" onclick="switchTab('home')"><div class="nav-icon">🏡</div><div class="nav-label">Home</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var xp=1240,xpMax=2000,xpBase=1000;
+var waterGlasses=3,waterMax=8;
+var mealSlot=1;
+var timerInterval=null,timerSeconds=0,timerPaused=false,timerXP=0;
+var currentEnergy='med';
+var graceLeft=2;
+
+var suggestByEnergy={
+  low:[
+    {emoji:'🛋',title:'Legs up the wall',sub:'Lie down, legs up. Just breathe.',time:'5 min',xp:70,secs:300,desc:'Lie on the floor, legs up the wall. Just breathe. That is the move.'},
+    {emoji:'😴',title:'Lying stretch',sub:'Floor or bed. Whatever feels tight.',time:'1-3 min',xp:50,secs:180,desc:'Full body stretch on the floor or bed. Go slow.'},
+    {emoji:'🤙',title:'Intentional fidget',sub:'Shake, roll, wiggle. All counts.',time:'2 min',xp:30,secs:120,desc:'Shake your hands. Roll your ankles. Neck rolls. All of it counts.'},
+    {emoji:'🧍',title:'Just stand up',sub:'That is genuinely it.',time:'10 sec',xp:20,secs:0,desc:'Stand up. You moved. Sit back down if you want.'}
+  ],
+  med:[
+    {emoji:'🎵',title:'Spontaneous dance break',sub:'Put on whatever, move around',time:'1-3 min',xp:80,secs:180,desc:'Put on whatever song. Move around your space. No choreography required.'},
+    {emoji:'🚶',title:'Wiggle walk',sub:'Walk to another room. Wiggle.',time:'2-5 min',xp:60,secs:300,desc:'Walk to another room and back. Wiggle while you do it. That counts.'},
+    {emoji:'🧹',title:'Power chore sprint',sub:'Clean fast, music loud.',time:'15 min',xp:100,secs:900,desc:'Pick one surface. Clean fast. Music loud. Stop when timer ends.'},
+    {emoji:'🐕',title:'Cleo walk',sub:'Podcast in, brain off.',time:'any',xp:120,secs:0,desc:'Grab Cleo and go. Any direction. Turn around whenever.'}
+  ],
+  high:[
+    {emoji:'💥',title:'Chaos burst',sub:'Jump, spin, shake. Full chaos.',time:'5 min',xp:80,secs:300,desc:'Jump, spin, shake — full chaos mode. No rules.'},
+    {emoji:'🔥',title:'3 song dance session',sub:'Kitchen. Go completely feral.',time:'10 min',xp:120,secs:600,desc:'3 songs. Kitchen. Go completely feral.'},
+    {emoji:'🌤',title:'Quick outside loop',sub:'Around the block. No plan.',time:'10 min',xp:90,secs:600,desc:'Around the block, no plan. Turn around whenever.'},
+    {emoji:'🎵',title:'Hype playlist blast',sub:'Full volume. Move everything.',time:'5 min',xp:80,secs:300,desc:'Put on your most hype playlist. Full volume. Move everything.'}
+  ]
+};
+var suggestIdx=0;
+
+function switchTab(tab){
+  ['today','move','fuel','bribe','quest','prizes','home'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab);
+    var n=document.getElementById('nav-'+t);
+    if(n) n.classList.toggle('active',t===tab);
+  });
+  document.querySelectorAll('.tab').forEach(function(el,i){
+    el.classList.toggle('active',['today','move','fuel','bribe','quest','prizes','home'][i]===tab);
+  });
+  if(tab==='prizes') renderPrizes();
+}
+
+/* HOME SETUP */
+function hsToggle(id){
+  var card=document.getElementById(id);
+  card.classList.toggle('open');
+}
+
+function hsLog(name,xpAmt){
+  addXP(parseInt(xpAmt));
+  document.getElementById('s-move').textContent=parseInt(document.getElementById('s-move').textContent)+1;
+  var active=document.getElementById('hs-active');
+  active.classList.remove('hidden');
+  document.getElementById('hs-active-text').textContent=name;
+  showToast(name+' — +'+xpAmt+' XP. Well... that counts!');
+}
+
+function hsStopActive(){
+  document.getElementById('hs-active').classList.add('hidden');
+  showToast('Logged and done. Good.');
+}
+
+var lowEffortOptions=[
+  'Just step for one minute',
+  'Hold the dumbbells once',
+  'Switch to standing for a bit',
+  'One squeeze on the thigh toner',
+  'Wear the kegel balls during your next task',
+  'Step while you read this',
+  'Stand up and immediately sit back down'
+];
+var lowEffortIdx=0;
+function hsLowEffortMode(){
+  var opt=lowEffortOptions[lowEffortIdx%lowEffortOptions.length];
+  lowEffortIdx++;
+  showToast(opt);
+  addXP(20);
+}
+
+/* SIDE QUEST */
+var sqCheckedIn=false;
+var sqSelectedNudge=null;
+
+function sqCheckIn(){
+  if(sqCheckedIn)return;
+  sqCheckedIn=true;
+  var btn=document.getElementById('sq-checkin-btn');
+  btn.textContent='Checked in ✓';
+  btn.classList.add('done');
+  btn.disabled=true;
+  document.getElementById('sq-done').style.display='block';
+  addXP(150);
+  document.getElementById('s-move').textContent=parseInt(document.getElementById('s-move').textContent)+1;
+  showToast('You went. That counts. +150 XP ⚡');
+}
+
+function sqSelectNudge(el,name){
+  sqSelectedNudge=name;
+  document.querySelectorAll('.sq-nudge-card').forEach(function(c){c.style.borderColor='';});
+  el.style.borderColor='var(--teal)';
+  showToast(name+' — tap "I went" when you\'re back');
+}
+
+function sqPickActivity(el){
+  el.classList.toggle('picked');
+  var name=el.querySelector('.sq-activity-name').textContent;
+  if(el.classList.contains('picked')){
+    showToast(name+' — optional. No pressure.');
+  }
+}
+
+function sqToggleReward(el){
+  el.classList.toggle('active');
+  if(el.classList.contains('active')){
+    showToast('Reward locked in: '+el.textContent);
+  }
+}
+
+function addXPOld_disabled(amt){}
+
+function selectEnergy(level){
+  currentEnergy=level;
+  ['low','med','high'].forEach(function(l){document.getElementById('ebtn-'+l).classList.toggle('selected',l===level);});
+  var labels={low:'Suggested for low energy',med:'Suggested for medium energy',high:'Suggested for high energy'};
+  document.getElementById('suggest-label').textContent=labels[level];
+  suggestIdx=0;
+  renderSuggest();
+}
+
+function renderSuggest(){
+  var pool=suggestByEnergy[currentEnergy];
+  var a=pool[suggestIdx%pool.length];
+  var b=pool[(suggestIdx+1)%pool.length];
+  document.getElementById('suggest-cards').innerHTML=
+    makeCard(a)+makeCard(b);
+}
+
+function makeCard(m){
+  return '<div class="move-card '+currentEnergy+'-energy" onclick="startMove(\''+m.title+'\','+m.secs+',\''+m.desc+'\','+m.xp+')">'
+    +'<div class="move-emoji">'+m.emoji+'</div>'
+    +'<div class="move-body"><div class="move-title">'+m.title+'</div><div class="move-sub">'+m.sub+'</div>'
+    +'<div class="move-meta"><span class="move-time">'+m.time+'</span><span class="move-xp">+'+m.xp+' XP</span></div></div></div>';
+}
+
+function rerollSuggest(){
+  suggestIdx+=2;
+  renderSuggest();
+  showToast('Different vibe loaded');
+}
+
+function startMove(name,secs,desc,xpAmt){
+  timerXP=xpAmt;
+  if(secs>0){
+    timerSeconds=secs;
+    timerPaused=false;
+    var card=document.getElementById('timer-card');
+    card.classList.remove('hidden');
+    document.getElementById('timer-label').textContent=name;
+    document.getElementById('timer-desc').textContent=desc;
+    document.getElementById('timer-pause-btn').textContent='Pause';
+    updateTimerDisplay();
+    clearInterval(timerInterval);
+    timerInterval=setInterval(function(){
+      if(!timerPaused){timerSeconds--;updateTimerDisplay();if(timerSeconds<=0){clearInterval(timerInterval);showToast('Time\'s up! ⚡');}}
+    },1000);
+    switchTab('move');
+    showToast(name+' started!');
+  } else {
+    stealthLog(name,xpAmt.toString());
+  }
+}
+
+function updateTimerDisplay(){
+  var m=Math.floor(Math.max(0,timerSeconds)/60);
+  var s=Math.max(0,timerSeconds)%60;
+  document.getElementById('timer-display').textContent=m+':'+(s<10?'0':'')+s;
+}
+
+function pauseTimer(){
+  timerPaused=!timerPaused;
+  document.getElementById('timer-pause-btn').textContent=timerPaused?'Resume':'Pause';
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
+  document.getElementById('timer-card').classList.add('hidden');
+  addXP(timerXP);
+  document.getElementById('s-move').textContent=parseInt(document.getElementById('s-move').textContent)+1;
+  showToast('Movement logged! +'+timerXP+' XP ⚡');
+}
+
+function stealthLog(name,xpAmt){
+  addXP(parseInt(xpAmt));
+  document.getElementById('s-move').textContent=parseInt(document.getElementById('s-move').textContent)+1;
+  showToast(name+' — +'+xpAmt+' XP. Well... that counts!');
+}
+
+function dismissNudge(id){
+  var el=document.getElementById(id);
+  el.style.opacity='0';el.style.transition='opacity .3s';
+  setTimeout(function(){el.style.display='none';},300);
+}
+
+function logWater(type){
+  var amt=type==='Full glass'?1:type==='Half glass'?0.5:0.25;
+  waterGlasses=Math.min(waterMax,waterGlasses+amt);
+  var pct=Math.round((waterGlasses/waterMax)*100);
+  document.getElementById('water-fill').style.width=pct+'%';
+  var label=Math.round(waterGlasses)+' / '+waterMax+' glasses';
+  document.getElementById('water-label-text').textContent=label;
+  document.getElementById('water-count-label').textContent=Math.round(waterGlasses)+' of '+waterMax+' glasses';
+  document.getElementById('water-since').textContent='just now';
+  document.getElementById('s-water').textContent=Math.round(waterGlasses);
+  dismissNudge('water-nudge');
+  addXP(10);
+  showToast('Hydrated! +10 XP');
+}
+
+function toggleNutrient(row){
+  var check=row.querySelector('.nutrient-check');
+  check.classList.toggle('checked');
+  if(check.classList.contains('checked')){check.classList.add('pulse');setTimeout(function(){check.classList.remove('pulse');},350);addXP(10);showToast('Brain nutrient logged! +10 XP');}
+}
+
+function switchFuelMode(mode){
+  document.getElementById('mode-normal').classList.toggle('active',mode==='normal');
+  document.getElementById('mode-spoons').classList.toggle('active',mode==='spoons');
+  document.getElementById('panel-normal').style.display=mode==='normal'?'block':'none';
+  document.getElementById('panel-spoons').style.display=mode==='spoons'?'block':'none';
+}
+
+function fillMealSlot(name){
+  var slot=document.getElementById('slot-'+mealSlot);
+  if(!slot)return;
+  slot.style.opacity='1';
+  var circle=slot.querySelector('.meal-circle');
+  circle.classList.remove('empty');
+  circle.innerHTML='<div class="meal-circle-dot"></div>';
+  slot.querySelector('div:last-child').innerHTML='<div class="meal-name-text">'+name+'</div>';
+  mealSlot++;
+  var lbl=document.getElementById('meal-count-label');
+  if(lbl)lbl.textContent=mealSlot+' meal'+(mealSlot===1?'':'s')+' logged today';
+}
+
+function logMeal(name){addXP(30);showToast(name+' — +30 XP!');fillMealSlot(name);}
+function logSpoon(card,name){card.classList.add('logged');addXP(30);showToast(name+' logged! +30 XP');fillMealSlot(name);}
+
+
+var toastTimer;
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove('show');},2600);
+}
+
+/* BRIBE SYSTEM */
+var tasksCompleted=0;
+var selectedReward=null;
+var currentTaskName='';
+var currentTaskType='';
+
+var rewards={
+  small:[
+    {emoji:'📱',name:'Guilt-free scroll',desc:'No timer, no limits, no guilt'},
+    {emoji:'🎨',name:'Coloring time',desc:'10-20 min creative session'},
+    {emoji:'📺',name:'One episode',desc:'Whatever you want, no skipping'},
+    {emoji:'🛍',name:'Amazon browse',desc:'Add stuff to your cart guilt-free'},
+    {emoji:'🎮',name:'Gaming break',desc:'15-20 min, no pressure to stop'},
+    {emoji:'✏️',name:'Art supplies browse',desc:'Look at pretty things to buy'}
+  ],
+  medium:[
+    {emoji:'📦',name:'Small Amazon treat',desc:'Something under $15, just because'},
+    {emoji:'📺',name:'Guilt-free TV block',desc:'2 episodes, phone allowed'},
+    {emoji:'🎨',name:'Art supply order',desc:'That thing you have been eyeing'},
+    {emoji:'🎮',name:'Long gaming session',desc:'No time limit, you earned it'},
+    {emoji:'📚',name:'Coloring book order',desc:'Pick a new one for yourself'},
+    {emoji:'🛍',name:'Treat yourself browse',desc:'Scroll, save, maybe buy'}
+  ],
+  'work-bare':[
+    {emoji:'🚫',name:'No working for 15 min',desc:'Full stop. Phone down optional.'},
+    {emoji:'📱',name:'Mindless scroll break',desc:'Complete brain off, no guilt'},
+    {emoji:'🎵',name:'One hype song',desc:'Loud. Just for you.'},
+    {emoji:'☕',name:'Drink something nice',desc:'Make a drink, sit down, do nothing'}
+  ],
+  'work-full':[
+    {emoji:'🚫',name:'No working for 1 hour',desc:'Hard stop. You finished it.'},
+    {emoji:'📦',name:'Amazon reward order',desc:'You finished the thing. Buy something.'},
+    {emoji:'📺',name:'Full show episode',desc:'Whatever you want, uninterrupted'},
+    {emoji:'🎮',name:'Gaming session',desc:'Open-ended, no guilt attached'}
+  ]
+};
+
+function toggleTask(id){
+  var card=document.getElementById(id);
+  if(card.classList.contains('done'))return;
+  card.classList.toggle('open');
+}
+
+function completeTask(cardId,taskName,type,logName){
+  var card=document.getElementById(cardId);
+  card.classList.remove('open');
+  card.classList.add('done');
+  tasksCompleted++;
+  currentTaskName=taskName;
+  currentTaskType=type;
+  addXP(type==='full'||type==='work-full'?120:60);
+  checkCombo();
+  showRewardModal(taskName,type);
+}
+
+function checkCombo(){
+  if(tasksCompleted>=2){
+    var banner=document.getElementById('combo-banner');
+    banner.style.display='flex';
+    document.getElementById('combo-text').textContent=tasksCompleted+' tasks done — combo unlocked!';
+  }
+}
+
+function showRewardModal(taskName,type){
+  selectedReward=null;
+  document.getElementById('reward-task-name').textContent=taskName;
+  var pool=rewards[type]||rewards.small;
+  var grid=document.getElementById('reward-grid');
+  grid.innerHTML='';
+  pool.forEach(function(r,i){
+    grid.innerHTML+='<div class="reward-card" id="rc-'+i+'" onclick="selectReward('+i+',\''+r.name+'\')">'
+      +'<div class="reward-emoji">'+r.emoji+'</div>'
+      +'<div class="reward-name">'+r.name+'</div>'
+      +'<div class="reward-desc">'+r.desc+'</div>'
+      +'</div>';
+  });
+  document.getElementById('reward-confirm').classList.remove('ready');
+  document.getElementById('reward-overlay').classList.add('show');
+}
+
+function selectReward(idx,name){
+  selectedReward=name;
+  document.querySelectorAll('.reward-card').forEach(function(c,i){c.classList.toggle('selected',i===idx);});
+  document.getElementById('reward-confirm').classList.add('ready');
+}
+
+function claimReward(){
+  if(!selectedReward)return;
+  document.getElementById('reward-overlay').classList.remove('show');
+  showToast('Reward claimed: '+selectedReward+' ⚡');
+}
+
+function closeReward(){
+  document.getElementById('reward-overlay').classList.remove('show');
+}
+
+function closeRewardIfOutside(e){
+  if(e.target===document.getElementById('reward-overlay'))closeReward();
+}
+
+/* PRIZES SYSTEM */
+var ptsBalance=340;
+var bankSaved=0;
+var bankGoal=null;
+var currentPrizeMode='spend';
+var claimedSpend={};
+
+var spendPrizes=[
+  {emoji:'📱',name:'Guilt-free scroll',desc:'No timer, no limits, no guilt. Phone on couch, brain off.',cost:50},
+  {emoji:'📺',name:'One full episode',desc:'Whatever you want. No skipping the intro.',cost:60},
+  {emoji:'🎨',name:'Coloring session',desc:'20 min with your coloring book. Interruptions not allowed.',cost:70},
+  {emoji:'🎮',name:'Gaming break',desc:'Uninterrupted. No guilt about the time.',cost:80},
+  {emoji:'🕯',name:'Candle and do nothing',desc:'Light a candle. Sit. Exist. That is the whole plan.',cost:40},
+  {emoji:'🛁',name:'Bath as a treat',desc:'Not a hygiene task. A deliberate nice thing.',cost:90},
+  {emoji:'🎵',name:'Full album listen',desc:'One album, start to finish, no skipping.',cost:50},
+  {emoji:'📖',name:'Reading time',desc:'Whatever you are into. No time limit.',cost:60},
+  {emoji:'🧴',name:'Skincare as self-care',desc:'The nice routine. Not rushed.',cost:50},
+  {emoji:'🛌',name:'Official do nothing pass',desc:'Declared downtime. Productivity guilt is cancelled.',cost:100}
+];
+
+var bankPrizes=[
+  {emoji:'🎨',name:'Local art supply store trip',desc:'Go browse, pick something nice. No list required.',cost:400},
+  {emoji:'🖼',name:'Etsy order — something small',desc:'That sticker pack or print you saved. Actually buy it.',cost:300},
+  {emoji:'🧶',name:'Craft supply haul',desc:'Washi tape, stickers, whatever your current thing is.',cost:350},
+  {emoji:'☕',name:'New coffee shop afternoon',desc:'Go sit somewhere new with no agenda for an hour.',cost:300},
+  {emoji:'📚',name:'Used bookstore browse',desc:'Spend an hour in there. Buy whatever calls to you.',cost:250},
+  {emoji:'💅',name:'Nail or spa appointment',desc:'Book it. Actually go.',cost:600},
+  {emoji:'🌄',name:'Utah day trip',desc:'Drive somewhere you have not been. Just a drive counts.',cost:500},
+  {emoji:'🐾',name:'Something for Cleo',desc:'Local pet shop. Let her pick something.',cost:250},
+  {emoji:'🎭',name:'One-off creative class',desc:'Pottery, painting, whatever sounds fun right now.',cost:700},
+  {emoji:'🧹',name:'Hire the thing out',desc:'TaskRabbit or local help for the task you hate most.',cost:800}
+];
+
+function renderPrizes(){
+  document.getElementById('pts-display').textContent=ptsBalance;
+  renderSpend();
+  renderBank();
+}
+
+function renderSpend(){
+  var container=document.getElementById('spend-cards');
+  container.innerHTML='';
+  spendPrizes.forEach(function(p,i){
+    var claimed=claimedSpend[i];
+    var cantAfford=ptsBalance<p.cost&&!claimed;
+    var el=document.createElement('div');
+    el.className='prize-card'+(claimed?' claimed':'')+(cantAfford?' cant-afford':'');
+    el.innerHTML='<div class="prize-emoji">'+p.emoji+'</div>'
+      +'<div class="prize-body"><div class="prize-name">'+p.name+'</div><div class="prize-desc">'+p.desc+'</div>'
+      +(claimed?'<div class="prize-claimed-tag">claimed tonight</div>':'')+'</div>'
+      +'<div class="prize-cost"><div>'+p.cost+' pts</div></div>';
+    if(!claimed){
+      el.onclick=function(){spendPrize(i,p);};
+    }
+    container.appendChild(el);
+  });
+}
+
+function renderBank(){
+  var container=document.getElementById('bank-cards');
+  container.innerHTML='';
+  bankPrizes.forEach(function(p,i){
+    var el=document.createElement('div');
+    el.className='prize-card';
+    el.innerHTML='<div class="prize-emoji">'+p.emoji+'</div>'
+      +'<div class="prize-body"><div class="prize-name">'+p.name+'</div><div class="prize-desc">'+p.desc+'</div></div>'
+      +'<div class="prize-cost">'+p.cost+' pts</div>';
+    el.onclick=function(){setBankGoal(i,p);};
+    container.appendChild(el);
+  });
+  updateBankCard();
+}
+
+function setBankGoal(idx,p){
+  bankGoal=p;
+  updateBankCard();
+  showToast('Saving toward: '+p.name);
+}
+
+function updateBankCard(){
+  if(!bankGoal){
+    document.getElementById('bank-goal-name').textContent='No goal set yet';
+    document.getElementById('bank-goal-desc').textContent='Pick something below to save toward';
+    document.getElementById('bank-fill').style.width='0%';
+    document.getElementById('bank-saved-label').textContent='0 pts banked';
+    document.getElementById('bank-goal-label').textContent='goal: —';
+    return;
+  }
+  var pct=Math.min(100,Math.round((bankSaved/bankGoal.cost)*100));
+  document.getElementById('bank-goal-name').textContent=bankGoal.name;
+  document.getElementById('bank-goal-desc').textContent=bankGoal.desc;
+  document.getElementById('bank-fill').style.width=pct+'%';
+  document.getElementById('bank-saved-label').textContent=bankSaved+' pts banked';
+  document.getElementById('bank-goal-label').textContent='goal: '+bankGoal.cost+' pts';
+  if(bankSaved>=bankGoal.cost){
+    document.getElementById('bank-goal-name').textContent=bankGoal.emoji+' '+bankGoal.name+' — ready to claim!';
+  }
+}
+
+function spendPrize(idx,p){
+  if(ptsBalance<p.cost){showToast('Not enough points yet — keep going!');return;}
+  ptsBalance-=p.cost;
+  claimedSpend[idx]=true;
+  document.getElementById('pts-display').textContent=ptsBalance;
+  renderSpend();
+  showToast(p.emoji+' '+p.name+' — enjoy it, you earned this ⚡');
+}
+
+function switchPrizeMode(mode){
+  currentPrizeMode=mode;
+  document.getElementById('pts-spend-btn').classList.toggle('active',mode==='spend');
+  document.getElementById('pts-bank-btn').classList.toggle('active',mode==='bank');
+  document.getElementById('pts-panel-spend').style.display=mode==='spend'?'block':'none';
+  document.getElementById('pts-panel-bank').style.display=mode==='bank'?'block':'none';
+  if(mode==='bank') renderBank();
+}
+
+function raidBank(){
+  if(bankSaved===0){showToast('Nothing banked yet — earn some points first!');return;}
+  ptsBalance+=bankSaved;
+  bankSaved=0;
+  document.getElementById('pts-display').textContent=ptsBalance;
+  updateBankCard();
+  showToast('Bank raided — points returned. No judgment. ⚡');
+}
+
+function addXP(amt){
+  xp+=amt;
+  ptsBalance+=Math.round(amt/3);
+  document.getElementById('xp-display').textContent=xp.toLocaleString()+' XP';
+  document.getElementById('xp-frac').textContent=xp+' / '+xpMax;
+  var pct=Math.min(100,Math.round((xp-xpBase)/(xpMax-xpBase)*100));
+  document.getElementById('xp-fill').style.width=pct+'%';
+  var pd=document.getElementById('pts-display');
+  if(pd) pd.textContent=ptsBalance;
+}
+</script>
+</body>
+</html>
